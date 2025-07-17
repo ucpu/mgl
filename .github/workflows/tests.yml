@@ -19,13 +19,9 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake ..
+        cmake -DMGL_BUILD_TEST=TRUE ..
 
     - name: Build
       run: |
         cd build
         cmake --build . -- -j$(( `sysctl -n hw.ncpu` + 1 ))
-
-    - name: Ls
-      run: |
-        ls -R .
