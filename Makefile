@@ -14,11 +14,8 @@ spirv_cross_lib_path ?= ./external/SPIRV-Cross/build
 spirv_tools_include_path ?= ./external/SPIRV-Tools/include
 spirv_tools_path ?= ./external/SPIRV-Tools/build
 
-glslang_include_path ?= ./external/glslang/glslang/Include
-
-
-#glslang_path ?= glslang
-#glslang_include_path ?= $(glslang_path)/build/include/glslang $(glslang_path)/glslang/Include
+glslang_path ?= ./external/glslang
+glslang_include_path ?= $(glslang_path)/glslang/Include
 #glslang_lib_path ?= $(glslang_path)/build/glslang $(glslang_path)/build/OGLCompilersDLL $(glslang_path)/build/glslang/OSDependent/Unix $(glslang_path)/build/StandAlone $(glslang_path)/build/SPIRV
 
 # build dir
@@ -56,7 +53,10 @@ endif
 
 LIBS += -L$(spirv_cross_lib_path) -lspirv-cross-core -lspirv-cross-c -lspirv-cross-cpp -lspirv-cross-msl -lspirv-cross-glsl -lspirv-cross-hlsl -lspirv-cross-reflect
 LIBS += -L$(brew_prefix)/lib
-LIBS += -lglslang -lMachineIndependent -lGenericCodeGen -lOGLCompiler -lOSDependent -lglslang-default-resource-limits -lSPIRV
+LIBS += -L$(glslang_path)/build/glslang -lglslang -lMachineIndependent -lGenericCodeGen -lglslang-default-resource-limits
+LIBS += -L$(glslang_path)/build/glslang/OSDependent/Unix -lOSDependent
+LIBS += -L$(glslang_path)/build/SPIRV -lSPIRV
+#LIBS += -L$(glslang_path)/build/OGLCompilersDLL -lOGLCompiler
 LIBS += -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
 LIBS += -lc++
 

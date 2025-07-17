@@ -1,6 +1,8 @@
 config.mk
 build/
 libmgl.dylib
+external/glfw/src/MGLContext.h
+external/glfw/src/MGLRenderer.h
 external/OpenGL-Registry/
 external/SPIRV-Cross/
 external/SPIRV-Headers/
