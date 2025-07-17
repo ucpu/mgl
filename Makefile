@@ -145,18 +145,19 @@ deps += $(mgl_objs:.o=.d)
 deps += $(mgl_arc_objs:.o=.d)
 
 
-mgl_lib := $(build_dir)/libmgl.dylib
+mgl_lib := $(build_dir)/libmgl.a
 
 $(mgl_lib): $(mgl_objs) $(mgl_arc_objs)
 	@mkdir -p $(dir $@)
-	$(CC) -dynamiclib -o $@ $^ $(LIBS)
+	ar rcs $@ $^ $(LIBS)
 	# loading dynamic library requires this
 	ln -fs $(mgl_lib) .
+	ls -la .
+	ls -la $(dir $@)
 
 
 # specific rules
 
-#lib: $(build_dir)/libglfw.dylib
 lib: $(mgl_lib)
 
 test: $(test_exe)
