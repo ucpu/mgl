@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
-project(MGL LANGUAGES C CXX OBJC OBJCXX)
+project(MGL LANGUAGES C CXX OBJC)
 
 execute_process(COMMAND "bash" "clone_external.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/external" COMMAND_ECHO STDOUT)
 execute_process(COMMAND "bash" "build_external.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/external" COMMAND_ECHO STDOUT)
 
-# Compiler flags
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -g -fsanitize=address -arch ${CMAKE_SYSTEM_PROCESSOR}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -fsanitize=address -arch ${CMAKE_SYSTEM_PROCESSOR}")
-set(CMAKE_OBJC_FLAGS "${CMAKE_OBJC_FLAGS} -O2 -g -fsanitize=address -arch ${CMAKE_SYSTEM_PROCESSOR}")
-set(CMAKE_OBJCXX_FLAGS "${CMAKE_OBJCXX_FLAGS} -O2 -g -fsanitize=address -arch ${CMAKE_SYSTEM_PROCESSOR}")
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 # Include paths
 include_directories(
@@ -22,43 +19,40 @@ include_directories(
 
 # Gather all source files
 file(GLOB_RECURSE MGL_SOURCES
-	src/*.c
-	src/*.cpp
-	src/*.m
-	src/*.mm
+	MGL/src/*.c
+	MGL/src/*.m
+	MGL/spirv_cross_c.cpp
 )
 
 # Static library target
 add_library(mgl STATIC ${MGL_SOURCES})
 
-# Link directories
-target_link_directories(mgl PRIVATE
-	external/SPIRV-Cross/build
-	external/glslang/build/SPIRV
-	external/glslang/build/glslang
-	external/glslang/build/glslang/OSDependent/Unix
-)
-
 # Link libraries
-target_link_libraries(mgl PRIVATE
-	GenericCodeGen
-	MachineIndependent
-	OSDependent
-	SPIRV
-	glslang
-	glslang-default-resource-limits
-	spirv-cross-c
-	spirv-cross-core
-	spirv-cross-cpp
-	spirv-cross-glsl
-	spirv-cross-hlsl
-	spirv-cross-msl
-	spirv-cross-reflect
+target_link_libraries(mgl PUBLIC
+	"${CMAKE_CURRENT_LIST_DIR}/external/glslang/build/glslang/libGenericCodeGen.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/glslang/build/glslang/libMachineIndependent.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/glslang/build/glslang/libglslang-default-resource-limits.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/glslang/build/glslang/libglslang.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/glslang/build/glslang/OSDependent/Unix/libOSDependent.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/glslang/build/SPIRV/libSPIRV.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/SPIRV-Cross/build/libspirv-cross-c.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/SPIRV-Cross/build/libspirv-cross-core.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/SPIRV-Cross/build/libspirv-cross-cpp.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/SPIRV-Cross/build/libspirv-cross-glsl.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/SPIRV-Cross/build/libspirv-cross-hlsl.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/SPIRV-Cross/build/libspirv-cross-msl.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/SPIRV-Cross/build/libspirv-cross-reflect.a"
+	"${CMAKE_CURRENT_LIST_DIR}/external/SPIRV-Cross/build/libspirv-cross-util.a"
 )
 
 # macOS Frameworks
-target_link_options(mgl PRIVATE
-	"-framework" "Foundation"
-	"-framework" "Metal"
-	"-framework" "OpenGL"
+target_link_libraries(mgl PUBLIC
+	"-framework AppKit"
+	"-framework Cocoa"
+	"-framework CoreFoundation"
+	"-framework Foundation"
+	"-framework IOKit"
+	"-framework Metal"
+	"-framework OpenGL"
+	"-framework QuartzCore"
 )

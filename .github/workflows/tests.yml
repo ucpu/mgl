@@ -1,0 +1,31 @@
+name: Tests
+on: [push, pull_request]
+
+jobs:
+  MacOS:
+    name: macos-${{ matrix.os-version }}
+    runs-on: macos-${{ matrix.os-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os-version: [14, 15]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Configure
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . -- -j$(( `sysctl -n hw.ncpu` + 1 ))
+
+    - name: Ls
+      run: |
+        ls -R .
