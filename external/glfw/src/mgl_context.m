@@ -28,6 +28,9 @@ GLMContext createGLMContext(GLenum format, GLenum type,
 void MGLsetCurrentContext(GLMContext ctx);
 void MGLswapBuffers(GLMContext ctx);
 
+void MGLfunctionTableInitialize(void);
+void *MGLfunctionTableFind(const char *name);
+
 static void makeContextCurrentMGL(_GLFWwindow* window)
 {
     @autoreleasepool {
@@ -68,12 +71,9 @@ static int extensionSupportedMGL(const char* extension)
 static GLFWglproc getProcAddressMGL(const char* procname)
 {
     GLFWproc symbol;
-
     assert(_glfw.mgl.handle);
-
-    symbol = _glfwPlatformGetModuleSymbol(_glfw.mgl.handle, procname);
+    symbol = MGLfunctionTableFind(procname);
     assert(symbol);
-
     return symbol;
 }
 
@@ -96,17 +96,8 @@ GLFWbool _glfwInitMGL(void)
 {
     if (_glfw.mgl.handle)
         return GLFW_TRUE;
-
-    _glfw.mgl.handle = _glfwPlatformLoadModule("libmgl.dylib");
-    assert(_glfw.mgl.handle);
-
-    if (_glfw.mgl.handle == NULL)
-    {
-        _glfwInputError(GLFW_API_UNAVAILABLE,
-                        "MGL: Failed to locate libmgl.dylib");
-        return GLFW_FALSE;
-    }
-
+    MGLfunctionTableInitialize();
+    _glfw.mgl.handle = (void*)1; // the pointer may not be used, but should compare true
     return GLFW_TRUE;
 }
 
@@ -132,14 +123,14 @@ GLFWbool _glfwCreateContextMGL(_GLFWwindow* window,
     if (ctxconfig->major < 4)
     {
         _glfwInputError(GLFW_VERSION_UNAVAILABLE,
-                        "MGL: OpenGL 4.6 and above supported on MGL");
+                        "MGL: OpenGL 4.2 and above supported on MGL");
         return GLFW_FALSE;
     }
 
-    if (ctxconfig->minor < 6)
+    if (ctxconfig->minor < 2)
     {
         _glfwInputError(GLFW_VERSION_UNAVAILABLE,
-                        "MGL: OpenGL 4.6 and above supported on MGL");
+                        "MGL: OpenGL 4.2 and above supported on MGL");
         return GLFW_FALSE;
     }
 

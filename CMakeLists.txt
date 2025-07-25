@@ -17,9 +17,10 @@ add_subdirectory(external/glslang)
 add_subdirectory(external/glfw)
 
 file(GLOB_RECURSE MGL_SOURCES
-	MGL/src/*.c
-	MGL/src/*.m
 	MGL/spirv_cross_c.cpp
+	MGL/src/*.c
+	MGL/src/*.cpp
+	MGL/src/*.m
 )
 add_library(mgl_static STATIC ${MGL_SOURCES})
 target_include_directories(mgl_static PUBLIC 
